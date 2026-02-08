@@ -1,11 +1,12 @@
 local qualities = { "normal", "uncommon", "rare", "epic", "legendary" }
-local quality_layer_offset = {
+local off_layer_q = {
     normal = 0,
-    uncommon = 1,
-    rare = 2,
-    epic = 3,
-    legendary = 4
+    uncommon = 2,
+    rare = 4,
+    epic = 6,
+    legendary = 8
 }
+
 local quality_speed_mult = {
     normal = 1.00,
     uncommon = 1.15,
@@ -119,23 +120,40 @@ local function make_quality_tile(base_tile_name, item_name, q)
 
     -- t.transition_merges_with_tile = "concrete"
     -- t.placeable_by = { item = "tile-pickup-token-" .. item_name .. "-" .. q, count = 1 }
-    t.layer = (base.layer or 0) + 100 + 2*(quality_layer_offset[q] or 0)
-    t.transition_overlay_layer_offset = 0
 
-    -- if base_tile_name:find("refined", 1, true) then
-    --     t.layer = (base.layer or 0) + 2 * quality_layer_offset["legendary"] + 2 * (quality_layer_offset[q] or 0)
-    -- else
-    --     t.layer = (base.layer or 0) + 2 * (quality_layer_offset[q] or 0)
-    -- end
+    local b_layer = (base.layer or 0)
+    local off_layer = (off_layer_q[q] or 0)
+    local off_max_q = off_layer_q.legendary
+
+    if base_tile_name:find("hazard", 1, true) then
+        t.transition_overlay_layer_offset = 0
+        if base_tile_name:find("refined", 1, true) then
+            --refined-hazard-concrete
+            t.layer = b_layer + 3 * off_max_q + off_layer
+        else
+            --hazard-concrete
+            t.layer = b_layer + 1 * off_max_q + off_layer
+        end
+    else
+        t.transition_overlay_layer_offset = 0
+        if base_tile_name:find("refined", 1, true) then
+            --refined-concrete
+            t.layer = b_layer + 2 * off_max_q + off_layer
+        else
+            --concrete
+            t.layer = b_layer + 0 * off_max_q + off_layer
+        end
+    end
+
+
     if base_tile_name:find("hazard", 1, true) then
         t.tint = hazard_tint[q]
+
         if base_tile_name:find("refined", 1, true) then
             t.transition_merges_with_tile = "refined-concrete" .. "-quality-" .. q
         else
             t.transition_merges_with_tile = "concrete" .. "-quality-" .. q
         end
-
-
     else
         t.tint = concrete_tint[q]
     end
