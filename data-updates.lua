@@ -117,9 +117,9 @@ local function make_quality_tile(base_tile_name, item_name, q)
     t.minable.count = 1
     t.placeable_by = { item = item_name, count = 1 }
 
-    t.transition_merges_with_tile = "concrete"
+    -- t.transition_merges_with_tile = "concrete"
     -- t.placeable_by = { item = "tile-pickup-token-" .. item_name .. "-" .. q, count = 1 }
-    t.layer = (base.layer or 0) + 100 + (quality_layer_offset[q] or 0)
+    t.layer = (base.layer or 0) + 100 + 2*(quality_layer_offset[q] or 0)
     t.transition_overlay_layer_offset = 0
 
     -- if base_tile_name:find("refined", 1, true) then
@@ -129,6 +129,13 @@ local function make_quality_tile(base_tile_name, item_name, q)
     -- end
     if base_tile_name:find("hazard", 1, true) then
         t.tint = hazard_tint[q]
+        if base_tile_name:find("refined", 1, true) then
+            t.transition_merges_with_tile = "refined-concrete" .. "-quality-" .. q
+        else
+            t.transition_merges_with_tile = "concrete" .. "-quality-" .. q
+        end
+
+
     else
         t.tint = concrete_tint[q]
     end
