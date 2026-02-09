@@ -37,7 +37,7 @@ for name, tier in pairs(quality_data) do
     quality_offset[name] = level * 2
     quality_speed_mult[name] = 1 + level * 0.20
     base_tint[name] = tier.color
-    if name ~= "quality-unknown"then
+    if name ~= "quality-unknown" then
         table.insert(qualities, name)
     end
 end
@@ -196,7 +196,6 @@ for _, fam in ipairs(families) do
     local item_name = fam.base_item
 
     for _, q in ipairs(qualities) do
-
         table.insert(items, make_quality_item(item_name, q))
 
         for _, base_tile in ipairs(fam.base_tiles) do
@@ -226,66 +225,46 @@ patch_next_direction("refined-hazard-concrete-left", "refined-hazard-concrete-ri
 ---Recipes
 ------------------------------------------------------------------------
 
-local function patch_vanilla_concrete_recipes_to_normal()
-    -- build a fast lookup of the 4 base items
-    local base_items = {}
-    for _, fam in ipairs(families) do
-        base_items[fam.base_item] = true
-    end
 
-    for _, fam in ipairs(families) do
-        local item_name = fam.base_item
-        local r = data.raw.recipe[item_name]
-        if r then
-            ----------------------------------------------------------------
-            -- Patch ingredients: replace base concrete items with "-normal"
-            ----------------------------------------------------------------
-            for _, ing in ipairs(r.ingredients or {}) do
-                -- ingredient can be array {"concrete", 10} or dict {name="concrete", amount=10}
-                local ing_name = ing.name or ing[1]
-                if ing_name and base_items[ing_name] then
-                    local new_name = q_item_name(ing_name, "normal")
-                    if ing.name then
-                        ing.name = new_name
-                    else
-                        ing[1] = new_name
-                    end
-                end
-            end
-
-            ----------------------------------------------------------------
-            -- Patch output: result/result_count -> results with "-normal"
-            ----------------------------------------------------------------
-            local out = q_item_name(item_name, "normal")
-
-            -- keep original output count (handles result_count or results[1])
-            local out_amount = 1
-            if r.result then
-                out_amount = r.result_count or 1
-            elseif r.results and r.results[1] then
-                local first = r.results[1]
-                out_amount = first.amount or first[2] or 1
-            end
-
-            r.result = nil
-            r.result_count = nil
-            r.results = {
-                { type = "item", name = out, amount = out_amount }
-            }
-            r.main_product = out
-        end
-    end
+local base_items = {}
+for _, fam in ipairs(families) do
+    base_items[fam.base_item] = true
 end
 
-patch_vanilla_concrete_recipes_to_normal()
+for _, fam in ipairs(families) do
+    local item_name = fam.base_item
+    local r = data.raw.recipe[item_name]
+    if r then
+        --Patch ingredients
+        for _, ing in ipairs(r.ingredients or {}) do
+            local ing_name = ing.name or ing[1]
+            if ing_name and base_items[ing_name] then
+                local new_name = q_item_name(ing_name, "normal")
+                if ing.name then
+                    ing.name = new_name
+                else
+                    ing[1] = new_name
+                end
+            end
+        end
 
-------------------------------------------------------------------------
----Technologie
-------------------------------------------------------------------------
+        local out = q_item_name(item_name, "normal")
 
-local function unlock(tech_name, recipe_name)
-    local tech = data.raw.technology[tech_name]
-    if not tech then return end
-    tech.effects = tech.effects or {}
-    table.insert(tech.effects, { type = "unlock-recipe", recipe = recipe_name })
+        --determinate outut amount
+        local out_amount = 1
+        if r.result then
+            out_amount = r.result_count or 1
+        elseif r.results and r.results[1] then
+            local first = r.results[1]
+            out_amount = first.amount or first[2] or 1
+        end
+
+        r.result = nil
+        r.result_count = nil
+        r.results = {
+            { type = "item", name = out, amount = out_amount }
+        }
+        r.main_product = out
+        r.allow_quality = false
+    end
 end

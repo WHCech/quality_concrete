@@ -8,6 +8,6 @@
     "base >= 2.0.0",
     "space-age"
   ],
-  "description": "This mdo adds quality to concrete.",
+  "description": "This mod adds quality to concrete.",
   "space-age_required": true
 }
