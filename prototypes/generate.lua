@@ -1,11 +1,16 @@
 -- prototypes/generate.lua
+---@param naming Naming
+---@return nil
 return function(ctx, naming, items_mod, tiles_mod)
-    local items, tiles = {}, {}
+    local items, tiles, recycling_placeholders = {}, {}, {}
 
     for _, fam in ipairs(ctx.families) do
         local item_name = fam.base_item
+
         for _, q in ipairs(ctx.qualities) do
             items[#items + 1] = items_mod.make_quality_item(ctx, naming, item_name, q)
+            recycling_placeholders[#recycling_placeholders+1] = items_mod.make_recycling_placeholder(ctx, naming, item_name, q)
+
             for _, base_tile in ipairs(fam.base_tiles) do
                 tiles[#tiles + 1] = tiles_mod.make_quality_tile(ctx, naming, base_tile, item_name, q)
             end
@@ -13,8 +18,12 @@ return function(ctx, naming, items_mod, tiles_mod)
     end
 
     data:extend(items)
+    data:extend(recycling_placeholders)
     data:extend(tiles)
 
+
+    
+    --Patch directionf for tiles with orientation
     local function patch_next_direction(left_base, right_base)
         for _, q in ipairs(ctx.qualities) do
             local left = data.raw.tile[left_base .. "-quality-" .. q]

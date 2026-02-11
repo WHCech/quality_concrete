@@ -6,7 +6,8 @@
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0.0",
-    "space-age"
+    "space-age",
+    "runtime-spoilage-library"
   ],
   "description": "This mod adds quality to concrete.",
   "space-age_required": true
