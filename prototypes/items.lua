@@ -55,6 +55,7 @@ function M.make_recycling_placeholder(ctx, naming, item_name, q)
     return {
         type = "item",
         name = naming.q_recycling_placeholder_name(item_name, q),
+        localised_name = naming.localised_name_with_quality(ctx, item_name, q),
         icon = base_item.icon or "__base__/graphics/icons/concrete.png",
         icon_size = base_item.icon_size or 64,
         stack_size = 100,
