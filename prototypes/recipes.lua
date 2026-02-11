@@ -37,14 +37,18 @@ local function make_recycling_recipe(input, input_amount, output, output_amount,
         allow_productivity = false,
         auto_recycle = false,
         hidden = true,
+        hidden_in_factoriopedia = true,
         icons = recycling_icons(input)
     }
 end
 
-local function replace_ingredient(recipe, old, new)
+local function replace_ingredient(recipe, old, new, amount_mult)
     for _, ing in pairs(recipe.ingredients or {}) do
         if ing.name == old then
             ing.name = new
+            if amount_mult and ing.amount then
+                ing.amount = ing.amount * amount_mult
+            end
         end
     end
 end
@@ -64,19 +68,24 @@ return function(ctx, naming)
     end
     data:extend(recipes)
 
-    local refined_concrete = table.deepcopy(data.raw.recipe["refined-concrete"])
-    replace_ingredient(refined_concrete, "concrete", "stone-brick")
-    data:extend { refined_concrete }
+
+    local recipes_consuming_concrete = { "refined-concrete", "artillery-turret", "cargo-landing-pad", "centrifuge", "nuclear-reactor", "rocket-silo" }
+    for _, r in ipairs(recipes_consuming_concrete) do
+        local recipe = table.deepcopy(data.raw.recipe[r])
+        replace_ingredient(recipe, "concrete", "stone-brick", 5)
+        replace_ingredient(recipe, "refined-concrete", "stone-brick", 5)
+        data:extend { recipe }
+    end
 
     local hazard = table.deepcopy(data.raw.recipe["concrete"])
     hazard.name = "hazard-concrete"
-    hazard.results = {{ type = "item", name = "hazard-concrete", amount = 10 }}
+    hazard.results = { { type = "item", name = "hazard-concrete", amount = 10 } }
     replace_ingredient(hazard, "iron-ore", "copper-ore")
     data:extend { hazard }
 
     local refined_hazard = table.deepcopy(data.raw.recipe["refined-concrete"])
     refined_hazard.name = "refined-hazard-concrete"
-    refined_hazard.results = {{ type = "item", name = "refined-hazard-concrete", amount = 10 }}
+    refined_hazard.results = { { type = "item", name = "refined-hazard-concrete", amount = 10 } }
     replace_ingredient(refined_hazard, "iron-stick", "copper-cable")
     data:extend { refined_hazard }
 end

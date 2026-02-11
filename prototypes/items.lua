@@ -61,7 +61,6 @@ function M.make_recycling_placeholder(ctx, naming, item_name, q)
         auto_recycle = false,
         hidden = true,
         hidden_in_factoriopedia = true,
-        subgroup = "terrain",
         weight = base_item.weight,
 
         inventory_move_sound = ctx.item_sounds.concrete_inventory_move,

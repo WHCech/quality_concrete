@@ -62,56 +62,56 @@ script.on_event(defines.events.on_robot_built_tile, on_built_tile_handle_quality
 script.on_event(defines.events.script_raised_set_tiles, on_built_tile_handle_quality)
 
 
-script.on_event(defines.events.on_player_created, function(event)
-    local player = game.players[event.player_index]
-    local character = player.character or player.cutscene_character
-    if character then
-        character.insert { name = "concrete", quality = "normal", count = 10 }
-        character.insert { name = "concrete", quality = "uncommon", count = 10 }
-        character.insert { name = "concrete", quality = "rare", count = 10 }
-        character.insert { name = "concrete", quality = "epic", count = 10 }
-        character.insert { name = "concrete", quality = "legendary", count = 10 }
+-- script.on_event(defines.events.on_player_created, function(event)
+--     local player = game.players[event.player_index]
+--     local character = player.character or player.cutscene_character
+--     if character then
+--         character.insert { name = "concrete", quality = "normal", count = 10 }
+--         character.insert { name = "concrete", quality = "uncommon", count = 10 }
+--         character.insert { name = "concrete", quality = "rare", count = 10 }
+--         character.insert { name = "concrete", quality = "epic", count = 10 }
+--         character.insert { name = "concrete", quality = "legendary", count = 10 }
 
-        character.insert { name = "refined-concrete", quality = "normal", count = 10 }
-        character.insert { name = "refined-concrete", quality = "uncommon", count = 10 }
-        character.insert { name = "refined-concrete", quality = "rare", count = 10 }
-        character.insert { name = "refined-concrete", quality = "epic", count = 10 }
-        character.insert { name = "refined-concrete", quality = "legendary", count = 10 }
+--         character.insert { name = "refined-concrete", quality = "normal", count = 10 }
+--         character.insert { name = "refined-concrete", quality = "uncommon", count = 10 }
+--         character.insert { name = "refined-concrete", quality = "rare", count = 10 }
+--         character.insert { name = "refined-concrete", quality = "epic", count = 10 }
+--         character.insert { name = "refined-concrete", quality = "legendary", count = 10 }
 
-        character.insert { name = "hazard-concrete", quality = "normal", count = 10 }
-        character.insert { name = "hazard-concrete", quality = "uncommon", count = 10 }
-        character.insert { name = "hazard-concrete", quality = "rare", count = 10 }
-        character.insert { name = "hazard-concrete", quality = "epic", count = 10 }
-        character.insert { name = "hazard-concrete", quality = "legendary", count = 10 }
+--         character.insert { name = "hazard-concrete", quality = "normal", count = 10 }
+--         character.insert { name = "hazard-concrete", quality = "uncommon", count = 10 }
+--         character.insert { name = "hazard-concrete", quality = "rare", count = 10 }
+--         character.insert { name = "hazard-concrete", quality = "epic", count = 10 }
+--         character.insert { name = "hazard-concrete", quality = "legendary", count = 10 }
 
-        character.insert { name = "refined-hazard-concrete", quality = "normal", count = 10 }
-        character.insert { name = "refined-hazard-concrete", quality = "uncommon", count = 10 }
-        character.insert { name = "refined-hazard-concrete", quality = "rare", count = 10 }
-        character.insert { name = "refined-hazard-concrete", quality = "epic", count = 10 }
-        character.insert { name = "refined-hazard-concrete", quality = "legendary", count = 10 }
+--         character.insert { name = "refined-hazard-concrete", quality = "normal", count = 10 }
+--         character.insert { name = "refined-hazard-concrete", quality = "uncommon", count = 10 }
+--         character.insert { name = "refined-hazard-concrete", quality = "rare", count = 10 }
+--         character.insert { name = "refined-hazard-concrete", quality = "epic", count = 10 }
+--         character.insert { name = "refined-hazard-concrete", quality = "legendary", count = 10 }
 
-        player.set_quick_bar_slot(1, { name = "concrete", quality = "normal" })
-        player.set_quick_bar_slot(2, { name = "concrete", quality = "uncommon" })
-        player.set_quick_bar_slot(3, { name = "concrete", quality = "rare" })
-        player.set_quick_bar_slot(4, { name = "concrete", quality = "epic" })
-        player.set_quick_bar_slot(5, { name = "concrete", quality = "legendary" })
+--         player.set_quick_bar_slot(1, { name = "concrete", quality = "normal" })
+--         player.set_quick_bar_slot(2, { name = "concrete", quality = "uncommon" })
+--         player.set_quick_bar_slot(3, { name = "concrete", quality = "rare" })
+--         player.set_quick_bar_slot(4, { name = "concrete", quality = "epic" })
+--         player.set_quick_bar_slot(5, { name = "concrete", quality = "legendary" })
 
-        player.set_quick_bar_slot(6, { name = "hazard-concrete", quality = "normal" })
-        player.set_quick_bar_slot(7, { name = "hazard-concrete", quality = "uncommon" })
-        player.set_quick_bar_slot(8, { name = "hazard-concrete", quality = "rare" })
-        player.set_quick_bar_slot(9, { name = "hazard-concrete", quality = "epic" })
-        player.set_quick_bar_slot(10, { name = "hazard-concrete", quality = "legendary" })
+--         player.set_quick_bar_slot(6, { name = "hazard-concrete", quality = "normal" })
+--         player.set_quick_bar_slot(7, { name = "hazard-concrete", quality = "uncommon" })
+--         player.set_quick_bar_slot(8, { name = "hazard-concrete", quality = "rare" })
+--         player.set_quick_bar_slot(9, { name = "hazard-concrete", quality = "epic" })
+--         player.set_quick_bar_slot(10, { name = "hazard-concrete", quality = "legendary" })
 
-        player.set_quick_bar_slot(11, { name = "refined-concrete", quality = "normal" })
-        player.set_quick_bar_slot(12, { name = "refined-concrete", quality = "uncommon" })
-        player.set_quick_bar_slot(13, { name = "refined-concrete", quality = "rare" })
-        player.set_quick_bar_slot(14, { name = "refined-concrete", quality = "epic" })
-        player.set_quick_bar_slot(15, { name = "refined-concrete", quality = "legendary" })
+--         player.set_quick_bar_slot(11, { name = "refined-concrete", quality = "normal" })
+--         player.set_quick_bar_slot(12, { name = "refined-concrete", quality = "uncommon" })
+--         player.set_quick_bar_slot(13, { name = "refined-concrete", quality = "rare" })
+--         player.set_quick_bar_slot(14, { name = "refined-concrete", quality = "epic" })
+--         player.set_quick_bar_slot(15, { name = "refined-concrete", quality = "legendary" })
 
-        player.set_quick_bar_slot(16, { name = "refined-hazard-concrete", quality = "normal" })
-        player.set_quick_bar_slot(17, { name = "refined-hazard-concrete", quality = "uncommon" })
-        player.set_quick_bar_slot(18, { name = "refined-hazard-concrete", quality = "rare" })
-        player.set_quick_bar_slot(19, { name = "refined-hazard-concrete", quality = "epic" })
-        player.set_quick_bar_slot(20, { name = "refined-hazard-concrete", quality = "legendary" })
-    end
-end)
+--         player.set_quick_bar_slot(16, { name = "refined-hazard-concrete", quality = "normal" })
+--         player.set_quick_bar_slot(17, { name = "refined-hazard-concrete", quality = "uncommon" })
+--         player.set_quick_bar_slot(18, { name = "refined-hazard-concrete", quality = "rare" })
+--         player.set_quick_bar_slot(19, { name = "refined-hazard-concrete", quality = "epic" })
+--         player.set_quick_bar_slot(20, { name = "refined-hazard-concrete", quality = "legendary" })
+--     end
+-- end)

@@ -4,12 +4,13 @@
 return function(ctx, naming)
     for _, fam in ipairs(ctx.families) do
         local item_name = fam.base_item
-        data.raw.item[item_name].spoil_ticks = 1
+        local base_item = data.raw.item[item_name]
+        base_item.spoil_ticks = 1
         local rsl_results = {}
 
         for _, q in ipairs(ctx.qualities) do
             local costom_concrete_name = naming.q_item_name(item_name, q)
-            rsl_results[q] = { { name = costom_concrete_name, quality = "normal", weight = 1 } }
+            rsl_results[q] = { name = costom_concrete_name, quality = "normal" }
         end
 
         --Turns the base game's concrete into custom concrete that respect quality.
@@ -17,8 +18,12 @@ return function(ctx, naming)
         local reg_data_concrete = {
             original_item_type = "item",
             original_item_name = item_name,
+            placeholder_overrides = {                                                          ---?
+                icon = base_item.icon,                                                         ---? string,
+                localised_name = naming.localised_name_with_quality(ctx, item_name, "normal"), ---? LocalisedString,
+            },
             loop_spoil_safe_mode = true,
-            random = true,
+            random = false,
             conditional = true,
             condition_checker_func_name = "spoil_by_quality",
             condition_checker_func = [[
@@ -27,7 +32,7 @@ return function(ctx, naming)
                     return e or "normal"
                 end
             ]],
-            conditional_random_results = rsl_results,
+            conditional_results = rsl_results,
         }
 
         local my_rsl_registration_concrete = {
@@ -42,6 +47,7 @@ return function(ctx, naming)
 
         for _, q in ipairs(ctx.qualities) do
             local recycled_placeholder_name = naming.q_recycling_placeholder_name(item_name, q)
+            local recycled_placeholder_local_name = naming.localised_name_with_quality(ctx, item_name, q)
             data.raw.item[recycled_placeholder_name].spoil_ticks = 1
 
 
@@ -49,8 +55,12 @@ return function(ctx, naming)
             local reg_data_concrete_recycle = {
                 original_item_type = "item",
                 original_item_name = recycled_placeholder_name,
+                placeholder_overrides = {                                                      ---?
+                    icon = base_item.icon,                                                     ---? string,
+                    localised_name = recycled_placeholder_local_name, ---? LocalisedString,
+                },
                 loop_spoil_safe_mode = true,
-                random = true,
+                random = false,
                 conditional = true,
                 condition_checker_func_name = "find_quality_after_recycle",
                 condition_checker_func = [[
@@ -103,7 +113,7 @@ return function(ctx, naming)
                     return qualities[out_level + 1].name or "normal"
                 end
                 ]],
-                conditional_random_results = rsl_results,
+                conditional_results = rsl_results,
             }
 
             local my_rsl_registration_concrete_recycle = {
