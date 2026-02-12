@@ -1,7 +1,9 @@
 -- prototypes/tiles.lua
 local tile_graphics = require("__base__/prototypes/tile/tile-graphics")
-local tile_sounds = require("__space-age__/prototypes/tile/tile-sounds")
-
+local tile_sounds
+if mods["space-age"] then
+    tile_sounds = require("__space-age__/prototypes/tile/tile-sounds")
+end
 
 local M = {}
 
@@ -56,7 +58,13 @@ function M.make_quality_tile(ctx, naming, base_tile_name, item_name, q)
 
     local b_layer = (base.layer or 0)
     local off_layer = (ctx.quality_offset[q] or 0)
-    local max_offset = ctx.quality_offset.legendary or 0
+    local max_offset = 0
+
+    for _, v in pairs(ctx.quality_offset or {}) do
+        if v > max_offset then
+            max_offset = v
+        end
+    end
 
     if base_tile_name:find("hazard", 1, true) then
         t.tint = ctx.hazard_tint[q] or ctx.base_tint[q]
@@ -75,6 +83,14 @@ function M.make_quality_tile(ctx, naming, base_tile_name, item_name, q)
             t.layer = b_layer + 0 * max_offset + off_layer
         end
     end
+    log(string.format(
+        "QC\t%-30s\tL=%-4s\tO=%-4s\tM=%-4s",
+        tostring(t.name),
+        tostring(t.layer),
+        tostring(off_layer),
+        tostring(max_offset)
+    ))
+
     local frozen_merge_tile
     if base_tile_name:find("refined", 1, true) then
         frozen_merge_tile = "refined-concrete" .. "-quality-" .. q
@@ -82,14 +98,16 @@ function M.make_quality_tile(ctx, naming, base_tile_name, item_name, q)
         frozen_merge_tile = "concrete" .. "-quality-" .. q
     end
     t.transition_overlay_layer_offset = 0
-    t.frozen_variant = frozen_concrete(
-        t.name,
-        t.minable.result,
-        frozen_merge_tile,
-        base_tile_name,
-        t.layer,
-        t.localised_name
-    )
+    if mods["space-age"] then
+        t.frozen_variant = frozen_concrete(
+            t.name,
+            t.minable.result,
+            frozen_merge_tile,
+            base_tile_name,
+            t.layer,
+            t.localised_name
+        )
+    end
 
     local mult = ctx.quality_speed_mult[q] or 1.0
     if t.walking_speed_modifier ~= nil then
