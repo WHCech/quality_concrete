@@ -8,10 +8,15 @@
   "dependencies": [
     "base >= 2.0.0",
     "runtime-spoilage-library",
-    "? Quality-Plus-Plus",
-    "? Quality-Plus-Plus-Shiny-Mechanics"
+    "quality",
+    "? space-age",
+    "! ic-more-qualities",
+    "! infinite-quality-tiers-plus",
+    "! infinite-quality-tiers",
+    "! Inverted-Quality",
+    "! jianxianpinzhi",
+    "! kraskaska-qualities-in-between"
   ],
-  "quality_required":true,
-  "spoiling_required":true,
-  "description": "This mod adds quality to concrete."
+  "spoiling_required": true,
+  "description": "Adds quality tiers to concrete with increasing movement speed bonuses and visual tints — just in case 26 exoskeletons aren't enough."
 }

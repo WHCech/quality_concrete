@@ -1,5 +1,43 @@
-<img width="885" height="680" alt="image" src="https://github.com/user-attachments/assets/cbd19892-44f2-41b1-a756-390656ed2129" />
-<img width="540" height="615" alt="image" src="https://github.com/user-attachments/assets/32441497-328e-482c-8d8e-866d68a8225c" />
+# Quality Concrete
+
+Adds **quality tiers** to concrete tiles, adjusting movement speed bonuses and colors.
+
+![Preview](graphics/images/all_types.png)
+
+copy_tiles.png
+Due to the way this is implemented, concrete is removed from recipes and replaced with stone bricks (may change in 2.1).
+
+---
+
+## Features
+
+* Quality variants for:
+  * Concrete
+  * Refined concrete
+  * Hazard concrete
+  * Refined hazard concrete
+* Movement speed bonus scales with quality tier
+* Works with Blueprints
+* Automatic color tinting per tier
+* Works with most mods that add additional quality tiers.
+
+---
+
+## Load behavior
+* Prototype generation runs in `data-updates.lua`
+* If your mod adds quality tiers, ensure they are defined before this stage.
+* Incompatible with mods that increase the total tile prototype count beyond 255.
+* Tested and compatible with:
+  * Additional-Qualities
+  * ArtifactQuality
+  * end-game-mythic-quality
+  * Inverted-Quality
+  * morequality
+  * prismatic-quality
+  * Quality-Plus-Plus
+  * Quality-Plus-Plus-Shiny-Mechanics
+  * QualityPlus
 
 
 
+Special thanks to SirPuck for the help and for creating the Runtime Spoilage Library.
