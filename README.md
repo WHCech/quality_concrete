@@ -4,7 +4,7 @@ Adds **quality tiers** to concrete tiles, adjusting movement speed bonuses and c
 
 ![Preview](graphics/images/all_types.png)
 
-copy_tiles.png
+
 Due to the way this is implemented, concrete is removed from recipes and replaced with stone bricks (may change in 2.1).
 
 ---
