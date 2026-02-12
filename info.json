@@ -7,7 +7,9 @@
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0.0",
-    "runtime-spoilage-library"
+    "runtime-spoilage-library",
+    "? Quality-Plus-Plus",
+    "? Quality-Plus-Plus-Shiny-Mechanics"
   ],
   "quality_required":true,
   "spoiling_required":true,

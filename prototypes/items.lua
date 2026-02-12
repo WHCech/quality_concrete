@@ -30,7 +30,7 @@ function M.make_quality_item(ctx, naming, item_name, q)
         name = naming.q_item_name(item_name, q),
         localised_name = naming.localised_name_with_quality(ctx, item_name, q),
         icons = icons,
-        order = base_item.order .. ctx.quality_offset[q] / 2,
+        order = base_item.order .. string.format("%03d", ctx.quality_offset[q] / 2),
         stack_size = 100,
         auto_recycle = false,
         hidden = true,
