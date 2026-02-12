@@ -3,7 +3,8 @@ data:extend({
     {
         type = "bool-setting",
         name = "debug-spawn-all-tiles",
-        setting_type = "runtime-global",
+        setting_type = "startup",
+        hidden = true,
         default_value = false,
         order = "a"
     }
