@@ -20,13 +20,6 @@ Due to the way this is implemented, concrete is removed from recipes and replace
 * Works with Blueprints
 * Automatic color tinting per tier
 * Works with most mods that add additional quality tiers.
-
----
-
-## Load behavior
-* Prototype generation runs in `data-updates.lua`
-* If your mod adds quality tiers, ensure they are defined before this stage.
-* Incompatible with mods that increase the total tile prototype count beyond 255.
 * Tested and compatible with:
   * Additional-Qualities
   * ArtifactQuality
@@ -37,6 +30,14 @@ Due to the way this is implemented, concrete is removed from recipes and replace
   * Quality-Plus-Plus
   * Quality-Plus-Plus-Shiny-Mechanics
   * QualityPlus
+
+---
+
+## Load behavior
+* Prototype generation runs in `data-updates.lua`
+* If your mod adds quality tiers, ensure they are defined before this stage.
+* Incompatible with mods that increase the total tile prototype count beyond 255.
+
 
 
 
