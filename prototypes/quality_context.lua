@@ -27,17 +27,22 @@ local hazard_tint = {
 
 for name, tier in pairs(quality_data) do
     local level = (tier.level or 0)
-    quality_offset[name] = level * 2
+
     quality_speed_mult[name] = 1 + level * 0.20
     base_tint[name] = tier.color
     if name ~= "quality-unknown" then
-        table.insert(qualities, name)
+        qualities[#qualities + 1] = name
     end
 end
 
 table.sort(qualities, function(a, b)
-    return (quality_data[a].level or 0) < (quality_data[b].level or 0)
+    return (quality_data[a] and quality_data[a].level or 0) < (quality_data[b] and quality_data[b].level or 0)
 end)
+
+-- Assign offsets by sorted index: 0,2,4,6,...
+for i, name in ipairs(qualities) do
+    quality_offset[name] = (i - 1) * 2
+end
 
 local families = {
     { base_item = "concrete",                base_tiles = { "concrete" } },

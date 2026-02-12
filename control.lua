@@ -1,117 +1,105 @@
 -- control.lua
 -- Quality Concrete
--- Applies different module bonuses depending on which material fully covers a machine.
 
-local function stack_quality(stack)
-    if not stack or not stack.valid_for_read then return "normal" end
-    if stack.quality then
-        return tostring(stack.quality.name)
-    end
-    return "normal"
+
+
+local TILE_FAMILIES = {
+    { base = "concrete-quality-" },
+    { base = "hazard-concrete-left-quality-" },
+    { base = "refined-concrete-quality-" },
+    { base = "refined-hazard-concrete-left-quality-" },
+}
+
+local TILE_SIZE = 3 -- 3x3 blocks
+local GAP = 1       -- space between blocks
+local CELL = TILE_SIZE + GAP
+
+local function debug_enabled()
+    return settings.global["debug-spawn-all-tiles"]
+        and settings.global["debug-spawn-all-tiles"].value == true
 end
 
-local function quality_tile_name(base_tile_name, q)
-    return base_tile_name .. "-quality-" .. q
-end
+local function sorted_qualities()
+    local q = {}
 
-local function on_built_tile_handle_quality(event)
-    local surface = game.get_surface(event.surface_index)
-    if not surface then return end
-
-    local q = "normal"
-
-    local qual = event.quality
-    if qual and qual.valid then
-        q = qual.name
-    end
-
-
-    -- Player: cursor stack is usually the tile item stack
-    if event.player_index and q == "normal" then
-        local p = game.get_player(event.player_index)
-        if p and p.valid then
-            q = stack_quality(p.cursor_stack)
+    for name, proto in pairs(prototypes.quality or {}) do
+        if name ~= "quality-unknown" then
+            q[#q + 1] = { name = name, level = proto.level or 0 }
         end
     end
 
-    -- Robot/mod: if event provides a stack, use it
-    if event.item_stack and q == "normal" then
-        q = stack_quality(event.item_stack)
-    elseif event.stack then
-        q = stack_quality(event.stack)
-    end
+    table.sort(q, function(a, b)
+        if a.level ~= b.level then return a.level < b.level end
+        return a.name < b.name
+    end)
 
-    local set = {}
-    for _, t in ipairs(event.tiles or {}) do
-        local placed = surface.get_tile(t.position.x, t.position.y)
-        local base_name = placed.name
+    local out = {}
+    for i = 1, #q do out[i] = q[i].name end
+    return out
+end
 
-        local desired = quality_tile_name(base_name, q)
-        if prototypes.tile[desired] then
-            set[#set + 1] = { name = desired, position = t.position }
+local function set_block(surface, x, y, tile)
+    local tiles = {}
+
+    for dx = 0, TILE_SIZE - 1 do
+        for dy = 0, TILE_SIZE - 1 do
+            tiles[#tiles + 1] = { name = tile, position = { x + dx, y + dy } }
         end
     end
 
-    if #set > 0 then
-        surface.set_tiles(set, true)
-    end
+    surface.set_tiles(tiles, true, true, true)
 end
 
-script.on_event(defines.events.on_player_built_tile, on_built_tile_handle_quality)
-script.on_event(defines.events.on_robot_built_tile, on_built_tile_handle_quality)
-script.on_event(defines.events.script_raised_set_tiles, on_built_tile_handle_quality)
+local function place_grid(player)
+    local surface   = player.surface
+    local qualities = sorted_qualities()
 
+    local cols      = #TILE_FAMILIES
+    local rows      = #qualities
 
--- script.on_event(defines.events.on_player_created, function(event)
---     local player = game.players[event.player_index]
---     local character = player.character or player.cutscene_character
---     if character then
---         character.insert { name = "concrete", quality = "normal", count = 10 }
---         character.insert { name = "concrete", quality = "uncommon", count = 10 }
---         character.insert { name = "concrete", quality = "rare", count = 10 }
---         character.insert { name = "concrete", quality = "epic", count = 10 }
---         character.insert { name = "concrete", quality = "legendary", count = 10 }
+    local width     = cols * CELL - GAP
+    local height    = rows * CELL - GAP
 
---         character.insert { name = "refined-concrete", quality = "normal", count = 10 }
---         character.insert { name = "refined-concrete", quality = "uncommon", count = 10 }
---         character.insert { name = "refined-concrete", quality = "rare", count = 10 }
---         character.insert { name = "refined-concrete", quality = "epic", count = 10 }
---         character.insert { name = "refined-concrete", quality = "legendary", count = 10 }
+    local start_x   = math.floor(player.position.x - width / 2)
+    local start_y   = math.floor(player.position.y - height / 2)
 
---         character.insert { name = "hazard-concrete", quality = "normal", count = 10 }
---         character.insert { name = "hazard-concrete", quality = "uncommon", count = 10 }
---         character.insert { name = "hazard-concrete", quality = "rare", count = 10 }
---         character.insert { name = "hazard-concrete", quality = "epic", count = 10 }
---         character.insert { name = "hazard-concrete", quality = "legendary", count = 10 }
+    for col, fam in ipairs(TILE_FAMILIES) do
+        local x = start_x + (col - 1) * CELL
 
---         character.insert { name = "refined-hazard-concrete", quality = "normal", count = 10 }
---         character.insert { name = "refined-hazard-concrete", quality = "uncommon", count = 10 }
---         character.insert { name = "refined-hazard-concrete", quality = "rare", count = 10 }
---         character.insert { name = "refined-hazard-concrete", quality = "epic", count = 10 }
---         character.insert { name = "refined-hazard-concrete", quality = "legendary", count = 10 }
+        for row, q in ipairs(qualities) do
+            local y = start_y + (row - 1) * CELL
+            local tile_name = fam.base .. q
 
---         player.set_quick_bar_slot(1, { name = "concrete", quality = "normal" })
---         player.set_quick_bar_slot(2, { name = "concrete", quality = "uncommon" })
---         player.set_quick_bar_slot(3, { name = "concrete", quality = "rare" })
---         player.set_quick_bar_slot(4, { name = "concrete", quality = "epic" })
---         player.set_quick_bar_slot(5, { name = "concrete", quality = "legendary" })
+            if prototypes.tile[tile_name] then
+                set_block(surface, x, y, tile_name)
+            else
+                log("QC\tmissing tile\t" .. tile_name)
+            end
+        end
+    end
 
---         player.set_quick_bar_slot(6, { name = "hazard-concrete", quality = "normal" })
---         player.set_quick_bar_slot(7, { name = "hazard-concrete", quality = "uncommon" })
---         player.set_quick_bar_slot(8, { name = "hazard-concrete", quality = "rare" })
---         player.set_quick_bar_slot(9, { name = "hazard-concrete", quality = "epic" })
---         player.set_quick_bar_slot(10, { name = "hazard-concrete", quality = "legendary" })
+    player.print("QC: spawned preview grid (debug-spawn-all-tiles).")
+end
 
---         player.set_quick_bar_slot(11, { name = "refined-concrete", quality = "normal" })
---         player.set_quick_bar_slot(12, { name = "refined-concrete", quality = "uncommon" })
---         player.set_quick_bar_slot(13, { name = "refined-concrete", quality = "rare" })
---         player.set_quick_bar_slot(14, { name = "refined-concrete", quality = "epic" })
---         player.set_quick_bar_slot(15, { name = "refined-concrete", quality = "legendary" })
+script.on_event(defines.events.on_player_created, function(e)
+    if not debug_enabled() then return end
+    if storage.qc_grid_done then return end
+    storage.qc_grid_done = true
 
---         player.set_quick_bar_slot(16, { name = "refined-hazard-concrete", quality = "normal" })
---         player.set_quick_bar_slot(17, { name = "refined-hazard-concrete", quality = "uncommon" })
---         player.set_quick_bar_slot(18, { name = "refined-hazard-concrete", quality = "rare" })
---         player.set_quick_bar_slot(19, { name = "refined-hazard-concrete", quality = "epic" })
---         player.set_quick_bar_slot(20, { name = "refined-hazard-concrete", quality = "legendary" })
---     end
--- end)
+    local player = game.get_player(e.player_index)
+    if player then
+        place_grid(player)
+    end
+end)
+
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(e)
+    if e.setting ~= "debug-spawn-all-tiles" then return end
+    if not debug_enabled() then return end
+    if storage.qc_grid_done then return end
+
+    local player = game.get_player(e.player_index) or game.get_player(1)
+    if player then
+        storage.qc_grid_done = true
+        place_grid(player)
+    end
+end)

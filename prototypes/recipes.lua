@@ -69,7 +69,44 @@ return function(ctx, naming)
     data:extend(recipes)
 
 
-    local recipes_consuming_concrete = { "refined-concrete", "artillery-turret", "cargo-landing-pad", "centrifuge", "nuclear-reactor", "rocket-silo" }
+    local recipes_consuming_concrete = {}
+    local concrete_items = {}
+    for _, fam in ipairs(ctx.families) do
+        concrete_items[fam.base_item] = true
+    end
+
+
+    local function recipe_uses_concrete(recipe)
+        local function check_ingredients(ings)
+            if not ings then return false end
+
+            for _, ing in pairs(ings) do
+                local name = ing.name or ing[1]
+                if concrete_items[name] then
+                    return true
+                end
+            end
+            return false
+        end
+
+        -- modern unified ingredients
+        if check_ingredients(recipe.ingredients) then
+            return true
+        end
+
+        -- old difficulty split
+        if recipe.normal and check_ingredients(recipe.normal.ingredients) then return true end
+        if recipe.expensive and check_ingredients(recipe.expensive.ingredients) then return true end
+
+        return false
+    end
+
+    for name, recipe in pairs(data.raw.recipe) do
+        if recipe_uses_concrete(recipe) then
+            recipes_consuming_concrete[#recipes_consuming_concrete + 1] = name
+        end
+    end
+
     for _, r in ipairs(recipes_consuming_concrete) do
         local recipe = table.deepcopy(data.raw.recipe[r])
         replace_ingredient(recipe, "concrete", "stone-brick", 5)
