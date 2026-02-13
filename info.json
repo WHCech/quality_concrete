@@ -1,13 +1,14 @@
 {
   "name": "quality_concrete",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Quality Concrete",
   "author": "Zelaron",
   "contact": "Discord : used_to_be_shinto",
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0.0",
-    "runtime-spoilage-library",
+    "runtime-spoilage-library >= 2.2.1",
+    "runtime-spoilage-library < 2.3.0",
     "quality",
     "? space-age",
     "! ic-more-qualities",
