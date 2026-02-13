@@ -13,7 +13,7 @@ local concrete_tint = {
     normal = { r = 1.0, g = 1.0, b = 1.0, a = 1 },
     uncommon = { r = 0.7, g = 1.0, b = 0.7, a = 1 },
     rare = { r = 0.7, g = 0.8, b = 1.0, a = 1 },
-    epic = { r = 1.0, g = 0.7, b = 0.7, a = 1 },
+    epic = { r = 0.8, g = 0.6, b = 0.7, a = 1 },
     legendary = { r = 1.0, g = 0.85, b = 0.65, a = 1 },
 }
 
@@ -21,7 +21,7 @@ local hazard_tint = {
     normal = { r = 1.0, g = 1.0, b = 1.0, a = 1 },
     uncommon = { r = 0.7, g = 1.0, b = 0.7, a = 1 },
     rare = { r = 0.7, g = 0.7, b = 1.0, a = 1 },
-    epic = { r = 0.9, g = 0.7, b = 1.0, a = 1 },
+    epic = { r = 0.8, g = 0.6, b = 1.0, a = 1 },
     legendary = { r = 1.0, g = 0.85, b = 0.65, a = 1 },
 }
 
