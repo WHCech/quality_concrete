@@ -4,6 +4,7 @@ Date: XXX
   Major Features:
     - Due to a prior change. The following mod is no longer unsupported: Inverted-Quality
     - Make the epic quality tile more purple.
+    - Desaturate the colors for rare and uncommon quality.
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 13. 02. 2026
