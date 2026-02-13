@@ -15,8 +15,8 @@ local GAP = 1       -- space between blocks
 local CELL = TILE_SIZE + GAP
 
 local function debug_enabled()
-    return settings.global["debug-spawn-all-tiles"]
-        and settings.global["debug-spawn-all-tiles"].value == true
+    return settings.startup["debug-spawn-all-tiles"]
+        and settings.startup["debug-spawn-all-tiles"].value == true
 end
 
 local function sorted_qualities()
