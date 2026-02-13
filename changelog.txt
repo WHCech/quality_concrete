@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.2
+Date: xxx
+  Major Features:
+    - Due to a prior change. The following mod is no longer unsupported: Inverted-Quality
+---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 13. 02. 2026
   Major Features:

@@ -1,6 +1,6 @@
 {
   "name": "quality_concrete",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Quality Concrete",
   "author": "Zelaron",
   "contact": "Discord : used_to_be_shinto",
@@ -14,7 +14,6 @@
     "! ic-more-qualities",
     "! infinite-quality-tiers-plus",
     "! infinite-quality-tiers",
-    "! Inverted-Quality",
     "! jianxianpinzhi",
     "! kraskaska-qualities-in-between"
   ],
