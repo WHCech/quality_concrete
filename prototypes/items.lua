@@ -33,7 +33,7 @@ function M.make_quality_item(ctx, naming, item_name, q)
         order = base_item.order .. string.format("%03d", ctx.quality_offset[q] / 2),
         stack_size = 100,
         auto_recycle = false,
-        hidden = true,
+        -- hidden = true,
         hidden_in_factoriopedia = true,
         subgroup = "terrain",
         weight = base_item.weight,

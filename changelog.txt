@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.2
+Date: 14.02.2026
+  Major Features:
+    - Quality concrete now shows in filter selection.
+    - Due to a prior change. The following mod is no longer unsupported: Inverted-Quality.
+    - Made the epic quality tile more purple.
+    - Desaturate the colors for rare and uncommon quality.
+---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 13. 02. 2026
   Major Features:
