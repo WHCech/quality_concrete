@@ -1,6 +1,6 @@
 {
   "name": "quality_concrete",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "title": "Quality Concrete",
   "author": "Zelaron",
   "contact": "Discord : used_to_be_shinto",
@@ -15,7 +15,8 @@
     "! infinite-quality-tiers-plus",
     "! infinite-quality-tiers",
     "! jianxianpinzhi",
-    "! kraskaska-qualities-in-between"
+    "! kraskaska-qualities-in-between",
+    "! StableFoundations"
   ],
   "spoiling_required": true,
   "description": "Adds quality tiers to concrete with increasing movement speed bonuses and visual tints. Just in case 26 exoskeletons aren't enough."
