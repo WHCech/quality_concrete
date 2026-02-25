@@ -47,7 +47,8 @@ local function replace_ingredient(recipe, old, new, amount_mult)
         if ing.name == old then
             ing.name = new
             if amount_mult and ing.amount then
-                ing.amount = ing.amount * amount_mult
+                ing.amount = math.min(ing.amount * amount_mult, 65000)
+                
             end
         end
     end
