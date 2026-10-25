@@ -1,34 +1,17 @@
 -- prototypes/recipes.lua
-local function recycling_icons(item_name)
-    local item = data.raw.item[item_name]
-    local size = (item and item.icon_size) or 64
-
-    -- Prefer item.icon, but fall back if the item uses icons
-    local base_icon = item and item.icon
-    if not base_icon and item and item.icons and item.icons[1] then
-        base_icon = item.icons[1].icon
-        size = item.icons[1].icon_size or size
-    end
-    base_icon = base_icon or "__base__/graphics/icons/concrete.png"
-
-    return {
-        { icon = "__quality__/graphics/icons/recycling.png",     icon_size = 64 },
-        {
-            icon = base_icon,
-            icon_size = size,
-            scale = 0.4 * (64 / size),
-        },
-        { icon = "__quality__/graphics/icons/recycling-top.png", icon_size = 64 },
-    }
-end
+-- Defines the global generate_recycling_recipe_icons_from_item, which keeps every icon layer (quality badge included)
+require("__recycler__.recycling")
 
 local function make_recycling_recipe(input, input_amount, output, output_amount, crafting_speed)
     crafting_speed = crafting_speed or 0.25
+    local item = data.raw.item[input]
 
     return {
         type = "recipe",
         name = input .. "-recycling",
-        category = "recycling",
+        -- Same naming as the recycler's generated recipes: "<item> recycling"
+        localised_name = { "recipe-name.recycling", item.localised_name or { "item-name." .. input } },
+        categories = { "recycling" },
         order = "z",
         enabled = true,
         energy_required = crafting_speed,
@@ -38,20 +21,43 @@ local function make_recycling_recipe(input, input_amount, output, output_amount,
         auto_recycle = false,
         hidden = true,
         hidden_in_factoriopedia = true,
-        icons = recycling_icons(input)
+        icons = generate_recycling_recipe_icons_from_item(item)
     }
 end
 
+local function same_ingredient(a, b)
+    return a.type == b.type and a.name == b.name
+        and a.quality_min == b.quality_min and a.quality_max == b.quality_max and a.quality_change == b.quality_change
+end
+
 local function replace_ingredient(recipe, old, new, amount_mult)
-    for _, ing in pairs(recipe.ingredients or {}) do
+    if not recipe.ingredients then return end
+
+    local merged = {}
+    for _, ing in pairs(recipe.ingredients) do
         if ing.name == old then
             ing.name = new
             if amount_mult and ing.amount then
                 ing.amount = math.min(ing.amount * amount_mult, 65000)
-                
             end
         end
+
+        -- The rename can collide with an ingredient that is already there (e.g. concrete + stone-brick),
+        -- and duplicate ingredients fail to load, so fold them into one entry
+        local existing
+        for _, m in ipairs(merged) do
+            if same_ingredient(m, ing) then
+                existing = m
+                break
+            end
+        end
+        if existing and existing.amount and ing.amount then
+            existing.amount = math.min(existing.amount + ing.amount, 65000)
+        else
+            merged[#merged + 1] = ing
+        end
     end
+    recipe.ingredients = merged
 end
 
 ---@param naming Naming

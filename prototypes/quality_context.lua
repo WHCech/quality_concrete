@@ -44,12 +44,7 @@ for i, name in ipairs(qualities) do
     quality_offset[name] = (i - 1) * 2
 end
 
-local families = {
-    { base_item = "concrete",                base_tiles = { "concrete" } },
-    { base_item = "refined-concrete",        base_tiles = { "refined-concrete" } },
-    { base_item = "hazard-concrete",         base_tiles = { "hazard-concrete-left", "hazard-concrete-right" } },
-    { base_item = "refined-hazard-concrete", base_tiles = { "refined-hazard-concrete-left", "refined-hazard-concrete-right" } },
-}
+local families = require("__quality_concrete__/prototypes/families")
 
 local function collect_quality_unlock_data()
     local tech_to_quality_pairs = {}

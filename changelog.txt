@@ -1,8 +1,16 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.1.6
-Date: 25.02.2026
-  Changes:
-    - No changes yet.
+Version: 1.0.0
+Date: 25.10.2026
+  Major Features:
+    - Migrated to Factorio 2.1.
+    - Replaced the Runtime Spoilage Library dependency with Runtime Spoilage Engine. The two are incompatible, so disable or remove Runtime Spoilage Library and install Runtime Spoilage Engine.
+    - Existing saves: back up your save, load it with the updated mod and Runtime Spoilage Engine enabled (don't sync mods with the save). Concrete still waiting on Runtime Spoilage Library is migrated and converted to the correct tier.
+    - Starting a new save is recommended.
+  Bugfixes:
+    - Fixed cycling quality on held concrete. It now switches to the concrete of the next tier, through all qualities of the chain.
+    - Fixed recycled concrete not keeping its own quality tier on top of the recycler's quality roll.
+    - Fixed a load error when replacing concrete gave a recipe the same ingredient twice.
+    - Fixed concrete recycling recipes showing an unknown key as their name and missing the quality icon.
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
 Date: 25.02.2026

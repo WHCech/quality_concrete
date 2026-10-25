@@ -1,0 +1,29 @@
+{
+  "item":
+  [
+    ["concrete-rsl-placeholder", "concrete"],
+    ["refined-concrete-rsl-placeholder", "refined-concrete"],
+    ["hazard-concrete-rsl-placeholder", "hazard-concrete"],
+    ["refined-hazard-concrete-rsl-placeholder", "refined-hazard-concrete"],
+    ["recycled-concrete-normal-rsl-placeholder", "recycled-concrete-normal"],
+    ["recycled-concrete-uncommon-rsl-placeholder", "recycled-concrete-uncommon"],
+    ["recycled-concrete-rare-rsl-placeholder", "recycled-concrete-rare"],
+    ["recycled-concrete-epic-rsl-placeholder", "recycled-concrete-epic"],
+    ["recycled-concrete-legendary-rsl-placeholder", "recycled-concrete-legendary"],
+    ["recycled-refined-concrete-normal-rsl-placeholder", "recycled-refined-concrete-normal"],
+    ["recycled-refined-concrete-uncommon-rsl-placeholder", "recycled-refined-concrete-uncommon"],
+    ["recycled-refined-concrete-rare-rsl-placeholder", "recycled-refined-concrete-rare"],
+    ["recycled-refined-concrete-epic-rsl-placeholder", "recycled-refined-concrete-epic"],
+    ["recycled-refined-concrete-legendary-rsl-placeholder", "recycled-refined-concrete-legendary"],
+    ["recycled-hazard-concrete-normal-rsl-placeholder", "recycled-hazard-concrete-normal"],
+    ["recycled-hazard-concrete-uncommon-rsl-placeholder", "recycled-hazard-concrete-uncommon"],
+    ["recycled-hazard-concrete-rare-rsl-placeholder", "recycled-hazard-concrete-rare"],
+    ["recycled-hazard-concrete-epic-rsl-placeholder", "recycled-hazard-concrete-epic"],
+    ["recycled-hazard-concrete-legendary-rsl-placeholder", "recycled-hazard-concrete-legendary"],
+    ["recycled-refined-hazard-concrete-normal-rsl-placeholder", "recycled-refined-hazard-concrete-normal"],
+    ["recycled-refined-hazard-concrete-uncommon-rsl-placeholder", "recycled-refined-hazard-concrete-uncommon"],
+    ["recycled-refined-hazard-concrete-rare-rsl-placeholder", "recycled-refined-hazard-concrete-rare"],
+    ["recycled-refined-hazard-concrete-epic-rsl-placeholder", "recycled-refined-hazard-concrete-epic"],
+    ["recycled-refined-hazard-concrete-legendary-rsl-placeholder", "recycled-refined-hazard-concrete-legendary"]
+  ]
+}
