@@ -1,6 +1,7 @@
 -- scripts/tiers.lua
 -- Runtime helpers for the tier items (concrete-rare and so on), shared by control.lua and migrations.
 local FAMILIES = require("__quality_concrete__/prototypes/families")
+local naming = require("__quality_concrete__/prototypes/naming")
 
 local M = {}
 
@@ -12,7 +13,7 @@ function M.item_tiers()
     item_tiers = {}
     for _, fam in ipairs(FAMILIES) do
         for q in pairs(prototypes.quality) do
-            local name = fam.base_item .. "-" .. q
+            local name = naming.q_item_name(fam.base_item, q)
             if prototypes.item[name] then
                 item_tiers[name] = { family = fam.base_item, tier = q }
             end
@@ -23,15 +24,15 @@ end
 
 -- Number of steps from the start of the quality's own chain (normal = 0, rare = 2).
 -- Counted per chain so a roll on a modded chain still adds its distance.
+---@return integer? nil for a modded chain that loops back on itself and has no start
 function M.chain_position(quality)
     local proto = prototypes.quality[quality]
     local steps = 0
-    -- the cap guards against a modded chain that loops back on itself
-    while proto and proto.previous and steps < 255 do
+    while proto and proto.previous do
+        if steps >= 255 then return nil end
         proto = proto.previous
         steps = steps + 1
     end
-    if steps >= 255 then return 0 end
     return steps
 end
 

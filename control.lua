@@ -1,5 +1,7 @@
 -- control.lua
 local FAMILIES = require("__quality_concrete__/prototypes/families")
+local naming = require("__quality_concrete__/prototypes/naming")
+local quality_order = require("__quality_concrete__/prototypes/quality_order")
 local tiers = require("__quality_concrete__/scripts/tiers")
 
 local TILE_SIZE = 3 -- 3x3 blocks
@@ -7,27 +9,8 @@ local GAP = 1       -- space between blocks
 local CELL = TILE_SIZE + GAP
 
 local function debug_enabled()
-    return settings.startup["debug-spawn-all-tiles"]
-        and settings.startup["debug-spawn-all-tiles"].value == true
-end
-
-local function sorted_qualities()
-    local q = {}
-
-    for name, proto in pairs(prototypes.quality or {}) do
-        if name ~= "quality-unknown" then
-            q[#q + 1] = { name = name, level = proto.level or 0 }
-        end
-    end
-
-    table.sort(q, function(a, b)
-        if a.level ~= b.level then return a.level < b.level end
-        return a.name < b.name
-    end)
-
-    local out = {}
-    for i = 1, #q do out[i] = q[i].name end
-    return out
+    local setting = settings.startup["quality_concrete-debug-spawn-all-tiles"]
+    return setting and setting.value == true
 end
 
 local function set_block(surface, x, y, tile)
@@ -44,7 +27,7 @@ end
 
 local function place_grid(player)
     local surface   = player.surface
-    local qualities = sorted_qualities()
+    local qualities = quality_order(prototypes.quality)
 
     local cols      = #FAMILIES
     local rows      = #qualities
@@ -60,7 +43,7 @@ local function place_grid(player)
 
         for row, q in ipairs(qualities) do
             local y = start_y + (row - 1) * CELL
-            local tile_name = fam.base_tiles[1] .. "-quality-" .. q
+            local tile_name = naming.q_tile_name(fam.base_tiles[1], q)
 
             if prototypes.tile[tile_name] then
                 set_block(surface, x, y, tile_name)
@@ -70,7 +53,7 @@ local function place_grid(player)
         end
     end
 
-    player.print("QC: spawned preview grid (debug-spawn-all-tiles).")
+    player.print("QC: spawned preview grid (quality_concrete-debug-spawn-all-tiles).")
 end
 
 script.on_event(defines.events.on_player_created, function(e)
@@ -114,7 +97,7 @@ local function step_tier(family, tier, direction)
         else
             proto = proto.previous
         end
-        if not proto or (not proto.hidden and tiers.item_tiers()[family .. "-" .. proto.name]) then break end
+        if not proto or (not proto.hidden and tiers.item_tiers()[naming.q_item_name(family, proto.name)]) then break end
     end
     return proto and proto.name
 end
@@ -150,7 +133,7 @@ local function on_cycle_quality(e, direction)
     if not info then return end
 
     local tier = step_tier(info.family, info.tier, direction)
-    local target = tier and (info.family .. "-" .. tier) or name
+    local target = tier and naming.q_item_name(info.family, tier) or name
 
     -- The game's own cycle runs right after this event, but only changes the cursor if the
     -- held quality has a neighbour in that direction (scrolling down from normal does nothing)
@@ -199,7 +182,7 @@ local CONVERSIONS = prototypes.mod_data["quality_concrete-craft-conversions"].da
 
 ---@return string? the tier item crafted concrete of this quality becomes
 local function converted_item(item_name, quality)
-    local name = item_name .. "-" .. quality
+    local name = naming.q_item_name(item_name, quality)
     if prototypes.item[name] then return name end
 end
 

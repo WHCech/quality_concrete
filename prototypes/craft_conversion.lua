@@ -52,8 +52,12 @@ return function(ctx)
         for _, result in pairs(recipe.results) do
             if result.type == "item" and base_items[result.name] then
                 result.name = "stone-brick"
+                -- Recycling results keep the part below one in extra_count_fraction; whole bricks from it move into the amounts
+                local fraction = (result.extra_count_fraction or 0) * BRICKS_PER_CONCRETE
+                local whole = math.floor(fraction)
+                if result.extra_count_fraction then result.extra_count_fraction = fraction - whole end
                 for _, field in pairs({ "amount", "amount_min", "amount_max" }) do
-                    if result[field] then result[field] = math.min(result[field] * BRICKS_PER_CONCRETE, 65000) end
+                    if result[field] then result[field] = math.min(result[field] * BRICKS_PER_CONCRETE + whole, 65000) end
                 end
             end
         end

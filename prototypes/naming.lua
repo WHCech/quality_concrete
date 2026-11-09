@@ -1,4 +1,5 @@
 -- prototypes/naming.lua
+-- Only localised_name_with_quality reads data.raw, so control.lua and migrations can require this too.
 ---@class Naming
 local M = {}
 
@@ -9,15 +10,11 @@ function M.q_item_name(item_name, q)
     return item_name .. "-" .. q
 end
 
----@param item_name ItemName
+---@param base_tile string
 ---@param q QualityName
----@return ItemName
-function M.q_tile_name(item_name, q)
-    local base = item_name
-    if item_name == "hazard-concrete" or item_name == "refined-hazard-concrete" then
-        base = base .. "-left"
-    end
-    return base .. "-quality-" .. q
+---@return string
+function M.q_tile_name(base_tile, q)
+    return base_tile .. "-quality-" .. q
 end
 
 -- "Concrete (Rare)" in the quality's color; normal has no suffix, like the base game

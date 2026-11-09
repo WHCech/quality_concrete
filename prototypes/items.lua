@@ -27,7 +27,8 @@ function M.quality_badge(q, base_icon_size)
 end
 
 ---@param naming Naming
-function M.make_quality_item(ctx, naming, item_name, q)
+function M.make_quality_item(ctx, naming, fam, q)
+    local item_name = fam.base_item
     local base_item = data.raw.item[item_name]
     local base_place = base_item.place_as_tile
 
@@ -42,7 +43,7 @@ function M.make_quality_item(ctx, naming, item_name, q)
         localised_name = naming.localised_name_with_quality(ctx, item_name, q),
         icons = icons,
         order = base_item.order .. string.format("%03d", ctx.quality_offset[q] / 2),
-        stack_size = 100,
+        stack_size = base_item.stack_size,
         auto_recycle = false,
         hidden_in_factoriopedia = true,
         subgroup = "terrain",
@@ -53,7 +54,7 @@ function M.make_quality_item(ctx, naming, item_name, q)
         drop_sound = ctx.item_sounds.concrete_inventory_move,
 
         place_as_tile = {
-            result = naming.q_tile_name(item_name, q),
+            result = naming.q_tile_name(fam.base_tiles[1], q),
             condition_size = base_place.condition_size or 1,
             condition = base_place.condition or { layers = { ground_tile = true } },
         },

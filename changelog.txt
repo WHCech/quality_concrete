@@ -6,9 +6,7 @@ Date: 25.10.2026
     - Removed the Runtime Spoilage Library dependency. Crafted concrete is now converted the moment a machine or player finishes crafting.
     - Concrete no longer spoils.
   Changes:
-    - Machines that can craft concrete have a trash slot. Converted concrete is placed there and can be taken out by inserters like the output.
-    - Recycling items built with concrete (and scrap) now gives stone bricks instead of concrete, matching their recipes. The recycler's quality roll still applies.
-    - Recycling concrete gives back its ingredients like any other item, at the concrete's quality plus the recycler's quality roll.
+    - Recycling items built with concrete (and scrap) gives stone bricks instead of concrete, matching their recipes.
   Bugfixes:
     - Fixed cycling quality on held concrete. It now switches to the concrete of the next tier, through all qualities of the chain.
     - Fixed machines deleting concrete when their output was not emptied. They now stop with a full output instead.

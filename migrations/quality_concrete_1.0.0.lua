@@ -5,6 +5,7 @@
 -- This converts both once, wherever an inventory can be reached. Belts, inserter hands and robots are not covered.
 
 local FAMILIES = require("__quality_concrete__/prototypes/families")
+local naming = require("__quality_concrete__/prototypes/naming")
 local tiers = require("__quality_concrete__/scripts/tiers")
 
 local base_items = {}
@@ -14,11 +15,12 @@ for _, fam in ipairs(FAMILIES) do base_items[fam.base_item] = true end
 local function target_of(name, quality)
     local target
     if base_items[name] then
-        target = name .. "-" .. quality
+        target = naming.q_item_name(name, quality)
     else
         local info = tiers.item_tiers()[name]
-        if info and quality ~= "normal" then
-            target = info.family .. "-" .. tiers.raise_tier(info.tier, tiers.chain_position(quality))
+        local steps = info and quality ~= "normal" and tiers.chain_position(quality)
+        if steps then
+            target = naming.q_item_name(info.family, tiers.raise_tier(info.tier, steps))
         end
     end
     if target and prototypes.item[target] then return target end
