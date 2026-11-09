@@ -7,8 +7,6 @@
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.7",
-    "runtime-spoilage-engine >= 1.0.2",
-    "! runtime-spoilage-library",
     "quality",
     "recycler",
     "? space-age",
@@ -19,6 +17,5 @@
     "! kraskaska-qualities-in-between",
     "! StableFoundations"
   ],
-  "spoiling_required": true,
   "description": "Adds quality tiers to concrete with increasing movement speed bonuses and visual tints. Just in case 26 exoskeletons aren't enough."
 }

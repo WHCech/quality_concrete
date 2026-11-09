@@ -1,28 +1,44 @@
 -- prototypes/recipes.lua
--- Defines the global generate_recycling_recipe_icons_from_item, which keeps every icon layer (quality badge included)
-require("__recycler__.recycling")
+local recycling = require("__recycler__.recycling")
 
-local function make_recycling_recipe(input, input_amount, output, output_amount, crafting_speed)
-    crafting_speed = crafting_speed or 0.25
-    local item = data.raw.item[input]
+-- Steps from normal for every quality on normal's chain (normal = 0, rare = 2)
+local function steps_from_normal()
+    local steps = {}
+    local name, step = "normal", 0
+    while name and data.raw.quality[name] and not steps[name] do
+        steps[name] = step
+        name = data.raw.quality[name].next
+        step = step + 1
+    end
+    return steps
+end
 
-    return {
-        type = "recipe",
-        name = input .. "-recycling",
-        -- Same naming as the recycler's generated recipes: "<item> recycling"
-        localised_name = { "recipe-name.recycling", item.localised_name or { "item-name." .. input } },
-        categories = { "recycling" },
-        order = "z",
-        enabled = true,
-        energy_required = crafting_speed,
-        ingredients = { { type = "item", name = input, amount = input_amount } },
-        results = { { type = "item", name = output, amount = output_amount } },
-        allow_productivity = false,
-        auto_recycle = false,
-        hidden = true,
-        hidden_in_factoriopedia = true,
-        icons = generate_recycling_recipe_icons_from_item(item)
-    }
+-- Recycling a tier item works like the base game's recycling of the concrete it stands for:
+-- it gives back a quarter of the recipe's ingredients, at the item's tier plus the recycler's roll.
+local function make_recycling_recipe(recipe, tier_item, q, steps)
+    local crafted = 0
+    for _, result in pairs(recipe.results) do
+        if result.type == "item" then crafted = result.amount end
+    end
+
+    -- The recycler's generator reverses a recipe; this one stands for crafting the tier item itself
+    recycling.generate_recycling_recipe({
+        name = tier_item,
+        main_product = tier_item,
+        energy_required = recipe.energy_required,
+        ingredients = table.deepcopy(recipe.ingredients),
+        results = { { type = "item", name = tier_item, amount = crafted } },
+    }, function() return true end)
+
+    -- The tier item is normal quality, so the recycler starts its roll at normal
+    for _, result in pairs(data.raw.recipe[tier_item .. "-recycling"].results) do
+        if steps[q] then
+            if steps[q] > 0 then result.quality_change = steps[q] end
+        else
+            -- A tier on another quality chain can't be reached from normal: give that quality, without a roll
+            result.quality_min, result.quality_max = q, q
+        end
+    end
 end
 
 local function same_ingredient(a, b)
@@ -62,63 +78,11 @@ end
 
 ---@param naming Naming
 return function(ctx, naming)
-    local recipes = {}
-
-    for _, fam in ipairs(ctx.families) do
-        local item_name = fam.base_item
-
-        for _, q in ipairs(ctx.qualities) do
-            local q_base_item = naming.q_item_name(item_name, q)
-            recipes[#recipes + 1] = make_recycling_recipe(q_base_item, 8,
-                naming.q_recycling_placeholder_name(item_name, q), 2)
+    -- Crafted concrete always becomes a tier item, so nothing can supply plain concrete as an ingredient
+    for _, recipe in pairs(data.raw.recipe) do
+        for _, fam in ipairs(ctx.families) do
+            replace_ingredient(recipe, fam.base_item, "stone-brick", 5)
         end
-    end
-    data:extend(recipes)
-
-
-    local recipes_consuming_concrete = {}
-    local concrete_items = {}
-    for _, fam in ipairs(ctx.families) do
-        concrete_items[fam.base_item] = true
-    end
-
-
-    local function recipe_uses_concrete(recipe)
-        local function check_ingredients(ings)
-            if not ings then return false end
-
-            for _, ing in pairs(ings) do
-                local name = ing.name or ing[1]
-                if concrete_items[name] then
-                    return true
-                end
-            end
-            return false
-        end
-
-        -- modern unified ingredients
-        if check_ingredients(recipe.ingredients) then
-            return true
-        end
-
-        -- old difficulty split
-        if recipe.normal and check_ingredients(recipe.normal.ingredients) then return true end
-        if recipe.expensive and check_ingredients(recipe.expensive.ingredients) then return true end
-
-        return false
-    end
-
-    for name, recipe in pairs(data.raw.recipe) do
-        if recipe_uses_concrete(recipe) then
-            recipes_consuming_concrete[#recipes_consuming_concrete + 1] = name
-        end
-    end
-
-    for _, r in ipairs(recipes_consuming_concrete) do
-        local recipe = table.deepcopy(data.raw.recipe[r])
-        replace_ingredient(recipe, "concrete", "stone-brick", 5)
-        replace_ingredient(recipe, "refined-concrete", "stone-brick", 5)
-        data:extend { recipe }
     end
 
     local hazard = table.deepcopy(data.raw.recipe["concrete"])
@@ -132,4 +96,12 @@ return function(ctx, naming)
     refined_hazard.results = { { type = "item", name = "refined-hazard-concrete", amount = 10 } }
     replace_ingredient(refined_hazard, "iron-stick", "copper-cable")
     data:extend { refined_hazard }
+
+    -- After the replacements above, so recycling gives back the ingredients the recipes now use
+    local steps = steps_from_normal()
+    for _, fam in ipairs(ctx.families) do
+        for _, q in ipairs(ctx.qualities) do
+            make_recycling_recipe(data.raw.recipe[fam.base_item], naming.q_item_name(fam.base_item, q), q, steps)
+        end
+    end
 end

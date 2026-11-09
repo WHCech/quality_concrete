@@ -1,9 +1,6 @@
 -- control.lua
--- Quality Concrete
-
-
-
 local FAMILIES = require("__quality_concrete__/prototypes/families")
+local tiers = require("__quality_concrete__/scripts/tiers")
 
 local TILE_SIZE = 3 -- 3x3 blocks
 local GAP = 1       -- space between blocks
@@ -92,22 +89,6 @@ end)
 -- Cycling quality on them would give e.g. concrete-normal at uncommon quality, so instead
 -- we step to the item of the next tier and put that one in the cursor.
 
-local item_tiers -- item name -> { family = ..., tier = quality name }
-
-local function get_item_tiers()
-    if item_tiers then return item_tiers end
-    item_tiers = {}
-    for _, fam in ipairs(FAMILIES) do
-        for q in pairs(prototypes.quality) do
-            local name = fam.base_item .. "-" .. q
-            if prototypes.item[name] then
-                item_tiers[name] = { family = fam.base_item, tier = q }
-            end
-        end
-    end
-    return item_tiers
-end
-
 ---@return string?, string? item name, quality name of whatever is in the cursor
 local function cursor_item(player)
     local stack = player.cursor_stack
@@ -133,7 +114,7 @@ local function step_tier(family, tier, direction)
         else
             proto = proto.previous
         end
-        if not proto or (not proto.hidden and get_item_tiers()[family .. "-" .. proto.name]) then break end
+        if not proto or (not proto.hidden and tiers.item_tiers()[family .. "-" .. proto.name]) then break end
     end
     return proto and proto.name
 end
@@ -165,7 +146,7 @@ local function on_cycle_quality(e, direction)
     if not player then return end
 
     local name, quality = cursor_item(player)
-    local info = name and get_item_tiers()[name]
+    local info = name and tiers.item_tiers()[name]
     if not info then return end
 
     local tier = step_tier(info.family, info.tier, direction)
@@ -208,12 +189,81 @@ script.on_event(defines.events.on_player_cursor_stack_changed, function(e)
     end
 end)
 
+-- Crafted concrete
+-- Recipes make the base game's concrete at a real quality, but a placed tile can't keep a quality.
+-- Right after the craft it is swapped for our item of that tier (concrete at rare -> concrete-rare at normal).
+-- data-final-fixes lists the recipes in a mod-data prototype.
+
+---@type table<string, string> recipe name -> base item it makes
+local CONVERSIONS = prototypes.mod_data["quality_concrete-craft-conversions"].data.recipes
+
+---@return string? the tier item crafted concrete of this quality becomes
+local function converted_item(item_name, quality)
+    local name = item_name .. "-" .. quality
+    if prototypes.item[name] then return name end
+end
+
+-- The output only takes the recipe's own products, so the tier item goes to the trash slots
+-- data-final-fixes added
+local function convert_in_output(output, trash, item_name, quality, count)
+    local target = converted_item(item_name, quality)
+    if not target then return end
+
+    local crafted = { name = item_name, quality = quality, count = count }
+    local removed = output.remove(crafted)
+    local inserted = trash.insert({ name = target, count = removed })
+    if inserted < removed then
+        -- Trash is full: keep the rest as crafted, which also stops the machine until it is emptied
+        crafted.count = removed - inserted
+        output.insert(crafted)
+    end
+end
+
+local function on_recipe_crafted(e)
+    local item_name = CONVERSIONS[e.recipe]
+    if not item_name or not e.entity.valid then return end
+    local output = e.entity.get_inventory(defines.inventory.crafter_output)
+    -- A machine added after data-final-fixes has no trash slots and is left alone
+    local trash = e.entity.get_inventory(defines.inventory.crafter_trash)
+    if not output or not trash then return end
+
+    -- Every quality, not only this craft's: a full trash may have left earlier crafts unconverted
+    for _, stack in pairs(output.get_contents()) do
+        if stack.name == item_name then
+            convert_in_output(output, trash, item_name, stack.quality, stack.count)
+        end
+    end
+end
+
+local crafted_events = {}
+for recipe_name in pairs(CONVERSIONS) do
+    local recipe = prototypes.recipe[recipe_name]
+    if recipe and recipe.on_crafted_event then
+        crafted_events[#crafted_events + 1] = recipe.on_crafted_event
+    end
+end
+if #crafted_events > 0 then
+    script.on_event(crafted_events, on_recipe_crafted)
+end
+
+-- Handcrafting doesn't raise the recipe's event; the crafted stack can still be changed before it is inserted
+script.on_event(defines.events.on_player_crafted_item, function(e)
+    local item_name = CONVERSIONS[e.recipe.name]
+    local stack = e.item_stack
+    if not item_name or not stack.valid_for_read or stack.name ~= item_name then return end
+
+    local target = converted_item(item_name, stack.quality.name)
+    if target then
+        stack.set_stack({ name = target, count = stack.count })
+    end
+end)
+
 -- One-time notice for saves upgraded from a version that used Runtime Spoilage Library
 script.on_configuration_changed(function(data)
     local change = data.mod_changes["quality_concrete"]
     if not (change and change.old_version) then return end
     if helpers.compare_versions(change.old_version, "1.0.0") >= 0 then return end
 
-    log("QC: upgraded from " .. change.old_version .. ", showing the RSL to RSE dependency notice")
+    log("QC: upgraded from " .. change.old_version .. ", showing the dependency notice")
     game.print({ "quality_concrete.dependency-notice" })
 end)

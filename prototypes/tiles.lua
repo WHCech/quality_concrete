@@ -83,13 +83,6 @@ function M.make_quality_tile(ctx, naming, base_tile_name, item_name, q)
             t.layer = b_layer + 0 * max_offset + off_layer
         end
     end
-    log(string.format(
-        "QC\t%-30s\tL=%-4s\tO=%-4s\tM=%-4s",
-        tostring(t.name),
-        tostring(t.layer),
-        tostring(off_layer),
-        tostring(max_offset)
-    ))
 
     local frozen_merge_tile
     if base_tile_name:find("refined", 1, true) then

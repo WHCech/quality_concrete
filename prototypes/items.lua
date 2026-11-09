@@ -1,28 +1,39 @@
 -- prototypes/items.lua
 local M = {}
 
+-- Small quality badge in the bottom-left corner of an icon of the given size.
+-- Qualities define either a single `icon` or a list of `icons` layers (common for modded qualities).
+---@return table[] icon layers, empty for normal or a quality without an icon
+function M.quality_badge(q, base_icon_size)
+    local qproto = data.raw.quality and data.raw.quality[q]
+    if not qproto or q == "normal" then return {} end
+
+    local layers = qproto.icons or (qproto.icon and { { icon = qproto.icon, icon_size = qproto.icon_size } }) or {}
+    local corner = { -base_icon_size * 0.15, base_icon_size * 0.15 }
+    local badge = {}
+    for _, layer in ipairs(layers) do
+        local size = layer.icon_size or 64
+        local shift = layer.shift or { 0, 0 }
+        -- Half the layer's own size: a lone 64px icon has a default scale of 0.5, which gives 0.25
+        badge[#badge + 1] = {
+            icon = layer.icon,
+            icon_size = size,
+            tint = layer.tint,
+            scale = (layer.scale or (32 / size)) * 0.5,
+            shift = { corner[1] + (shift[1] or shift.x or 0) * 0.5, corner[2] + (shift[2] or shift.y or 0) * 0.5 },
+        }
+    end
+    return badge
+end
+
 ---@param naming Naming
 function M.make_quality_item(ctx, naming, item_name, q)
-    if not q then return nil end
     local base_item = data.raw.item[item_name]
-    local base_place = base_item and base_item.place_as_tile
+    local base_place = base_item.place_as_tile
 
-    local base_icon = (base_item and base_item.icon) or "__base__/graphics/icons/iron-plate.png"
-    local base_icon_size = (base_item and base_item.icon_size) or 64
-
-    local qproto = data.raw.quality and data.raw.quality[q]
-
-    local icons = {
-        { icon = base_icon, icon_size = base_icon_size }
-    }
-
-    if qproto and qproto.icon and q ~= "normal" then
-        table.insert(icons, {
-            icon = qproto.icon,
-            icon_size = qproto.icon_size or 64,
-            scale = 0.25,
-            shift = { -base_icon_size * 0.15, base_icon_size * 0.15 },
-        })
+    local icons = table.deepcopy(base_item.icons) or { { icon = base_item.icon, icon_size = base_item.icon_size or 64 } }
+    for _, layer in ipairs(M.quality_badge(q, icons[1].icon_size or 64)) do
+        icons[#icons + 1] = layer
     end
 
     return {
@@ -33,7 +44,6 @@ function M.make_quality_item(ctx, naming, item_name, q)
         order = base_item.order .. string.format("%03d", ctx.quality_offset[q] / 2),
         stack_size = 100,
         auto_recycle = false,
-        -- hidden = true,
         hidden_in_factoriopedia = true,
         subgroup = "terrain",
         weight = base_item.weight,
@@ -44,29 +54,9 @@ function M.make_quality_item(ctx, naming, item_name, q)
 
         place_as_tile = {
             result = naming.q_tile_name(item_name, q),
-            condition_size = (base_place and base_place.condition_size) or 1,
-            condition = (base_place and base_place.condition) or { layers = { ground_tile = true } },
+            condition_size = base_place.condition_size or 1,
+            condition = base_place.condition or { layers = { ground_tile = true } },
         },
-    }
-end
-
-function M.make_recycling_placeholder(ctx, naming, item_name, q)
-    local base_item = data.raw.item[item_name]
-    return {
-        type = "item",
-        name = naming.q_recycling_placeholder_name(item_name, q),
-        localised_name = naming.localised_name_with_quality(ctx, item_name, q),
-        icon = base_item.icon or "__base__/graphics/icons/concrete.png",
-        icon_size = base_item.icon_size or 64,
-        stack_size = 100,
-        auto_recycle = false,
-        hidden = true,
-        hidden_in_factoriopedia = true,
-        weight = base_item.weight,
-
-        inventory_move_sound = ctx.item_sounds.concrete_inventory_move,
-        pick_sound = ctx.item_sounds.concrete_inventory_pickup,
-        drop_sound = ctx.item_sounds.concrete_inventory_move,
     }
 end
 

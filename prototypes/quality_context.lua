@@ -2,7 +2,6 @@
 local item_sounds = require("__base__.prototypes.item_sounds")
 
 local quality_data = data.raw.quality or {}
-log("QC: qualities:\n" .. serpent.line(quality_data))
 
 local qualities = {}
 local quality_offset = {}
@@ -44,43 +43,7 @@ for i, name in ipairs(qualities) do
     quality_offset[name] = (i - 1) * 2
 end
 
-local families = require("__quality_concrete__/prototypes/families")
-
-local function collect_quality_unlock_data()
-    local tech_to_quality_pairs = {}
-    local quality_to_techs = {}
-
-    for tech_name, tech in pairs(data.raw.technology or {}) do
-        local unlocked = {}
-
-        for _, effect in ipairs(tech.effects or {}) do
-            if effect.type == "unlock-quality" and effect.quality then
-                unlocked[#unlocked + 1] = effect.quality
-
-                local tlist = quality_to_techs[effect.quality]
-                if not tlist then
-                    tlist = {}
-                    quality_to_techs[effect.quality] = tlist
-                end
-                tlist[#tlist + 1] = tech_name
-            end
-        end
-
-        if #unlocked > 0 then
-            tech_to_quality_pairs[#tech_to_quality_pairs + 1] = {
-                technology_name = tech_name,
-                qualities = unlocked
-            }
-        end
-    end
-
-    return tech_to_quality_pairs, quality_to_techs
-end
-
-local tech_to_quality, quality_to_tech = collect_quality_unlock_data()
-
 return {
-    quality_data = quality_data,
     qualities = qualities,
     quality_offset = quality_offset,
     quality_speed_mult = quality_speed_mult,
@@ -89,8 +52,6 @@ return {
     hazard_tint = hazard_tint,
     base_tint = base_tint,
 
-    families = families,
+    families = require("__quality_concrete__/prototypes/families"),
     item_sounds = item_sounds,
-    tech_to_quality = tech_to_quality,
-    quality_to_tech = quality_to_tech
 }
